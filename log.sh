@@ -48,15 +48,14 @@ log() {
   fi
 
   if [ -n "${JSON:-}" ]; then
-    # Simplified JSON escaping for BSD and GNU sed compatibility
-    _escaped_msg=$(printf "%s" "$_msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
-    # Handle newlines and tabs separately for BSD sed compatibility
-    _escaped_msg=$(printf "%s" "$_escaped_msg" | sed -e 's/	/\\t/g')
-    _escaped_msg=$(printf "%s" "$_escaped_msg" | tr '\n' 'ⓝ' | sed 's/ⓝ/\\n/g')
+    # JSON escaping for BSD and GNU sed
+    _emsg=$(printf "%s" "$_msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
+    _emsg=$(printf "%s" "$_emsg" | tr '\t' '■' | sed 's/■/\\t/g')
+    _emsg=$(printf "%s" "$_emsg" | tr '\n' '□' | sed 's/□/\\n/g')
     
     _json_level=$(echo "$_level" | tr '[:upper:]' '[:lower:]')
     printf '{"level":"%s","message":"%s"}\n' \
-           "${_json_level}" "${_escaped_msg}" >&2
+           "${_json_level}" "${_emsg}" >&2
   else
     _usecolor=false; _reset=""; _tag=""; _tputs=false;
 
