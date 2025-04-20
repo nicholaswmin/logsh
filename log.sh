@@ -48,14 +48,15 @@ log() {
   fi
 
   if [ -n "${JSON:-}" ]; then
-    # JSON escaping for BSD and GNU sed
-    _emsg=$(printf "%s" "$_msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
-    _emsg=$(printf "%s" "$_emsg" | tr '\t' '■' | sed 's/■/\\t/g')
-    _emsg=$(printf "%s" "$_emsg" | tr '\n' '□' | sed 's/□/\\n/g')
+    # Replace one character at a time to avoid cross-platform sed issues
+    _emsg="$_msg"
+    _emsg=$(printf '%s' "$_emsg" | sed 's/\\/\\\\/g')      # Backslashes first
+    _emsg=$(printf '%s' "$_emsg" | sed 's/"/\\"/g')        # Then quotes
+    _emsg=$(printf '%s' "$_emsg" | tr '\n' '@' | sed 's/@/\\n/g')  # Newlines
+    _emsg=$(printf '%s' "$_emsg" | tr '\t' '#' | sed 's/#/\\t/g')  # Tabs
     
     _json_level=$(echo "$_level" | tr '[:upper:]' '[:lower:]')
-    printf '{"level":"%s","message":"%s"}\n' \
-           "${_json_level}" "${_emsg}" >&2
+    printf '{"level":"%s","message":"%s"}\n' "${_json_level}" "${_emsg}" >&2
   else
     _usecolor=false; _reset=""; _tag=""; _tputs=false;
 
