@@ -1,0 +1,33 @@
+name: tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install BATS on Ubuntu
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y bats
+      
+    - name: Install BATS on macOS
+      if: runner.os == 'macOS'
+      run: brew install bats-core
+    
+    - name: Run tests
+      run: bats logsh/test
+      
+    - name: Validate POSIX syntax
+      run: |
+        cd logsh
+        sh -n log.sh

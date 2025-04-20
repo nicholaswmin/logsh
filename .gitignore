@@ -1,0 +1,17 @@
+# test output
+test-results/
+test/*.tmp
+.wrapper.sh
+
+# scratchpads
+*.local.sh
+
+# editor files
+.*.swp
+*~
+
+# OS specific
+.DS_Store
+
+# temp. files
+*.tmp
