@@ -25,12 +25,15 @@ log_success "backup completed"
 
 ## Usage
 
-download the directory and source it in your scripts.
+get `log.sh`
+
 ```sh
-curl -s "https://raw.githubusercontent.com/nicholaswmin/logsh/main/log.sh" -o log.sh && chmod +x log.sh
+curl -s "https://raw.githubusercontent.com/nicholaswmin/logsh/main/log.sh" -o log.sh
 ```
+
+and source it:
+
 ```sh
-# source it
 . ./logsh/log.sh
 
 # Log different types of messages
