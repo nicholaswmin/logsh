@@ -26,7 +26,9 @@ log_success "backup completed"
 ## Usage
 
 download the directory and source it in your scripts.
-
+```sh
+curl -s "https://raw.githubusercontent.com/nicholaswmin/logsh/main/log.sh" -o log.sh && chmod +x log.sh
+```
 ```sh
 # source it
 . ./logsh/log.sh
@@ -131,7 +133,7 @@ shellcheck --shell=sh log.sh
 ```
 
 
-## License
+## License  
 
 > MIT-0 License
 >
