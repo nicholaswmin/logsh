@@ -1,3 +1,5 @@
+[![tests](https://github.com/nicholaswmin/logsh/actions/workflows/test.yml/badge.svg)](https://github.com/nicholaswmin/logsh/actions/workflows/test.yml)
+
 # logsh
 
 [POSIX.1-2017 - 2001][psx] & [CLI guidelines][clg] compliant logger 
