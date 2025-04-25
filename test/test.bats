@@ -216,3 +216,9 @@ capture_stderr() {
   JSON=1 FORCE_COLOR=1 run log_info "test message"
   [ "$output" = '{"level":"info","message":"test message"}' ]
 }
+
+# Test logt_info function
+@test "logt_info outputs timestamped info message" {
+  run capture_stderr logt_info "timestamped message"
+  [[ "$output" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} timestamped message$ ]]
+}

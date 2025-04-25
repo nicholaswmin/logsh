@@ -18,7 +18,7 @@ parseargs() {
     
     case "$1" in
       # Simple boolean flags - short and long options
-      -d|--debug)       DEBUG=1 ;;
+      -d|--debug)       DEBUG=1 ;;f
       -q|--quiet)       QUIET=1 ;;
       -j|--json)        JSON=1 ;;
       -n|--no-color)    NO_COLOR=1 ;;
@@ -47,11 +47,12 @@ parseargs "$@"
 
 # basic
 
-log_info  "info message"
-log_debug "debug message"
-log_warn  "warning message"
-log_error "error message"
-log_done  "done message"
+log_info  "bootstrapping..."
+log_warn  "fallback default"
+log_done  "backup completed"
+
+log_debug "reached codepath"
+log_error "failed to update"
 
 # timestamp
 

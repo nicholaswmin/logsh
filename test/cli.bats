@@ -3,7 +3,8 @@
 # Setup executed before each test
 setup() {
   # Create a temp file for our test results
-  export RESULT_FILE="$(mktemp)"
+  RESULT_FILE="$(mktemp)"
+  export RESULT_FILE
 }
 
 # Cleanup after each test
