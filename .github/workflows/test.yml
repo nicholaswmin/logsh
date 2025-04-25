@@ -18,7 +18,7 @@ jobs:
     
     - name: Install BATS on Ubuntu
       if: runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install -y bats-core
+      run: sudo apt-get update && sudo apt-get install -y bats
       
     - name: Install BATS on macOS
       if: runner.os == 'macOS'
