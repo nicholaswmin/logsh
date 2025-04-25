@@ -47,11 +47,11 @@ parseargs "$@"
 
 # basic
 
-log_info    "an info message"
-log_debug   "a debug message"
-log_warn    "a warning message"
-log_error   "an error message"
-log_success "a success message"
+log_info  "info message"
+log_debug "debug message"
+log_warn  "warning message"
+log_error "error message"
+log_done  "done message"
 
 # timestamp
 
