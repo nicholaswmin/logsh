@@ -3,7 +3,7 @@
 # Variables sourced externally:
 #   DEBUG, QUIET, LOG_LEVEL, NO_COLOR, FORCE_COLOR, JSON
 #   LOGCOL_INFO, LOGCOL_DEBUG, LOGCOL_WARN, LOGCOL_ERROR,
-#   LOGCOL_SUCCESS, LOGCOL_RESET
+#   LOGCOL_DONE, LOGCOL_RESET
 
 # A conventions-based POSIX-compliant logger.
 #
@@ -13,7 +13,7 @@
 #   log_debug "..."   # Log a debug message
 #    log_warn "..."   # Log a warning
 #   log_error "..."   # Log an error
-# log_success "..."   # Log a success message
+# log_done "..."   # Log a done message
 #
 # Environment:
 #   LOG_LEVEL=level # Filter on ERROR, WARN, INFO. Default: INFO
@@ -24,7 +24,7 @@
 #            JSON=1 # Output logs in JSON format
 #    LOGCOL_<LVL>   # Pre-set tput codes (e.g., LOGCOL_ERROR=$(tput setaf 1))
 #                   # avoids tput calls if set. LVL: INFO, DEBUG,
-#                   # WARN, ERROR, SUCCESS, RESET
+#                   # WARN, ERROR, DONE, RESET
 
 log() {
   _level=$(echo "$1" | tr '[:lower:]' '[:upper:]')
@@ -42,7 +42,7 @@ log() {
     _log_level_setting=$(echo "${LOG_LEVEL:-INFO}" | tr '[:lower:]' '[:upper:]')
     case "$_log_level_setting" in
       ERROR) [ "$_level" != "ERROR" ] && return 0 ;;
-      WARN) case "$_level" in INFO|SUCCESS|DEBUG) return 0 ;; esac ;;
+      WARN) case "$_level" in INFO|DONE|DEBUG) return 0 ;; esac ;;
       INFO|*) case "$_level" in DEBUG) return 0 ;; esac ;;
     esac
   fi
@@ -78,7 +78,7 @@ log() {
         DEBUG)   _tag="${LOGCOL_DEBUG:-$(tput dim || echo '')}" ;;
         WARN)    _tag="${LOGCOL_WARN:-$(tput setaf 3 || echo '')}" ;;
         ERROR)   _tag="${LOGCOL_ERROR:-$(tput setaf 1 || echo '')}" ;;
-        SUCCESS) _tag="${LOGCOL_SUCCESS:-$(tput setaf 2 || echo '')}" ;;
+        DONE) _tag="${LOGCOL_DONE:-$(tput setaf 2 || echo '')}" ;;
         INFO)    _tag="${LOGCOL_INFO:-}" ;;
         *)       _tag="" ;;
       esac
@@ -98,4 +98,4 @@ log_info()    { log INFO    "$@" ; }
 log_debug()   { log DEBUG   "$@" ; }
 log_warn()    { log WARN    "$@" ; }
 log_error()   { log ERROR   "$@" ; }
-log_success() { log SUCCESS "$@" ; }
+log_done() { log DONE "$@" ; }
