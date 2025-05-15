@@ -11,10 +11,13 @@
 ```sh
 . ./logsh/log.sh
 
-log_info    "bootstrapping..."
-log_warn    "fallback default"
-log_error   "failed to update"
-log_done "backup completed"
+log_info  "bootstrapping..."
+log_warn  "fallback default"
+log_done  "backup completed"
+
+log_debug "reached codepath"
+log_error "failed to update"
+
 ```
 
 ## Contents
@@ -43,7 +46,7 @@ log_info "an informational message"
 log_debug "a debug message (hidden by default)"
 log_warn "a warning message"
 log_error "an error message"
-log_done "a done message"
+log_success "a success message"
 
 # Or use a custom level
 log "CUSTOM" "a custom level message"
@@ -72,7 +75,7 @@ LOGCOL_INFO=$(tput setaf 7)      # White
 LOGCOL_DEBUG=$(tput dim)         # Dim
 LOGCOL_WARN=$(tput setaf 3)      # Yellow
 LOGCOL_ERROR=$(tput setaf 1)     # Red
-LOGCOL_DONE=$(tput setaf 2)   # Green
+LOGCOL_SUCCESS=$(tput setaf 2)   # Green
 LOGCOL_RESET=$(tput sgr0)        # Reset
 ```
 
@@ -88,7 +91,7 @@ LOGCOL_RESET=$(tput sgr0)        # Reset
 log_info "bootstrapping..."
 log_warn "config. file not found, fallback to defaults"
 log_error "failed to update"
-log_done "backup completed"
+log_success "backup completed"
 ```
 
 ### JSON output

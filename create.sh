@@ -16,7 +16,7 @@ cat > logger.sh << 'EOL'
 # Variables sourced externally:
 #   DEBUG, QUIET, LOG_LEVEL, NO_COLOR, FORCE_COLOR, JSON
 #   LOGCOL_INFO, LOGCOL_DEBUG, LOGCOL_WARN, LOGCOL_ERROR,
-#   LOGCOL_SUCCESS, LOGCOL_RESET
+#   LOGCOL_DONE, LOGCOL_RESET
 
 # A conventions-based POSIX-compliant logger.
 #
@@ -26,7 +26,7 @@ cat > logger.sh << 'EOL'
 #   log_debug "..."   # Log a debug message
 #    log_warn "..."   # Log a warning
 #   log_error "..."   # Log an error
-# log_success "..."   # Log a success message
+# log_done "..."   # Log a done message
 #
 # Environment:
 #   LOG_LEVEL=level # Filter on ERROR, WARN, INFO. Default: INFO
@@ -37,7 +37,7 @@ cat > logger.sh << 'EOL'
 #            JSON=1 # Output logs in JSON format
 #    LOGCOL_<LVL>   # Pre-set tput codes (e.g., LOGCOL_ERROR=$(tput setaf 1))
 #                   # avoids tput calls if set. LVL: INFO, DEBUG,
-#                   # WARN, ERROR, SUCCESS, RESET
+#                   # WARN, ERROR, DONE, RESET
 
 log() {
   _level=$(echo "$1" | tr '[:lower:]' '[:upper:]')
@@ -53,7 +53,7 @@ log() {
     _log_level_setting=$(echo "${LOG_LEVEL:-INFO}" | tr '[:lower:]' '[:upper:]')
     case "$_log_level_setting" in
       ERROR) [ "$_level" != "ERROR" ] && return 0 ;;
-      WARN) case "$_level" in INFO|SUCCESS|DEBUG) return 0 ;; esac ;;
+      WARN) case "$_level" in INFO|DONE|DEBUG) return 0 ;; esac ;;
       INFO|*) case "$_level" in DEBUG) return 0 ;; esac ;;
     esac
   fi
@@ -89,7 +89,7 @@ log() {
         DEBUG)   _tag="${LOGCOL_DEBUG:-$(tput dim)}" ;;
         WARN)    _tag="${LOGCOL_WARN:-$(tput setaf 3)}" ;;
         ERROR)   _tag="${LOGCOL_ERROR:-$(tput setaf 1)}" ;;
-        SUCCESS) _tag="${LOGCOL_SUCCESS:-$(tput setaf 2)}" ;;
+        DONE) _tag="${LOGCOL_DONE:-$(tput setaf 2)}" ;;
         INFO)    _tag="${LOGCOL_INFO:-}" ;;
         *)       _tag="" ;;
       esac
@@ -110,7 +110,7 @@ log_info()    { log INFO    "$@" ; }
 log_debug()   { log DEBUG   "$@" ; }
 log_warn()    { log WARN    "$@" ; }
 log_error()   { log ERROR   "$@" ; }
-log_success() { log SUCCESS "$@" ; }
+log_done() { log DONE "$@" ; }
 EOL
 
 # Create test/test.bats
@@ -135,7 +135,7 @@ setup() {
     
     # Clear environment variables that might affect tests
     unset DEBUG QUIET LOG_LEVEL NO_COLOR FORCE_COLOR JSON
-    unset LOGCOL_INFO LOGCOL_DEBUG LOGCOL_WARN LOGCOL_ERROR LOGCOL_SUCCESS LOGCOL_RESET
+    unset LOGCOL_INFO LOGCOL_DEBUG LOGCOL_WARN LOGCOL_ERROR LOGCOL_DONE LOGCOL_RESET
 }
 
 # Teardown function runs after each test
@@ -175,9 +175,9 @@ capture_stderr() {
     [ "$output" = "error message" ]
 }
 
-@test "basic: log_success outputs message to stderr" {
-    run capture_stderr log_success "success message"
-    [ "$output" = "success message" ]
+@test "basic: log_done outputs message to stderr" {
+    run capture_stderr log_done "done message"
+    [ "$output" = "done message" ]
 }
 
 @test "basic: log with custom level outputs message to stderr" {
@@ -201,8 +201,8 @@ capture_stderr() {
     DEBUG=1 run capture_stderr log_error "error message"
     [ "$output" = "[ERROR] error message" ]
     
-    DEBUG=1 run capture_stderr log_success "success message"
-    [ "$output" = "[SUCCESS] success message" ]
+    DEBUG=1 run capture_stderr log_done "done message"
+    [ "$output" = "[DONE] done message" ]
 }
 
 # Test QUIET mode
@@ -216,7 +216,7 @@ capture_stderr() {
     QUIET=1 run capture_stderr log_warn "warn message"
     [ "$output" = "" ]
     
-    QUIET=1 run capture_stderr log_success "success message"
+    QUIET=1 run capture_stderr log_done "done message"
     [ "$output" = "" ]
     
     # Only error messages should be shown in quiet mode
@@ -235,7 +235,7 @@ capture_stderr() {
     LOG_LEVEL=ERROR run capture_stderr log_warn "warn message"
     [ "$output" = "" ]
     
-    LOG_LEVEL=ERROR run capture_stderr log_success "success message"
+    LOG_LEVEL=ERROR run capture_stderr log_done "done message"
     [ "$output" = "" ]
     
     LOG_LEVEL=ERROR run capture_stderr log_error "error message"
@@ -252,14 +252,14 @@ capture_stderr() {
     LOG_LEVEL=WARN run capture_stderr log_warn "warn message"
     [ "$output" = "warn message" ]
     
-    LOG_LEVEL=WARN run capture_stderr log_success "success message"
+    LOG_LEVEL=WARN run capture_stderr log_done "done message"
     [ "$output" = "" ]
     
     LOG_LEVEL=WARN run capture_stderr log_error "error message"
     [ "$output" = "error message" ]
 }
 
-@test "log level: INFO shows INFO, SUCCESS, WARN, ERROR messages but not DEBUG" {
+@test "log level: INFO shows INFO, DONE, WARN, ERROR messages but not DEBUG" {
     LOG_LEVEL=INFO run capture_stderr log_info "info message"
     [ "$output" = "info message" ]
     
@@ -269,8 +269,8 @@ capture_stderr() {
     LOG_LEVEL=INFO run capture_stderr log_warn "warn message"
     [ "$output" = "warn message" ]
     
-    LOG_LEVEL=INFO run capture_stderr log_success "success message"
-    [ "$output" = "success message" ]
+    LOG_LEVEL=INFO run capture_stderr log_done "done message"
+    [ "$output" = "done message" ]
     
     LOG_LEVEL=INFO run capture_stderr log_error "error message"
     [ "$output" = "error message" ]
@@ -344,7 +344,7 @@ A simple, POSIX-compliant shell script logger that can output messages to stderr
 ## Features
 
 - POSIX-compliant (works in sh, bash, dash, etc.)
-- Log level filtering (DEBUG, INFO, WARN, ERROR, SUCCESS)
+- Log level filtering (DEBUG, INFO, WARN, ERROR, DONE)
 - Optional colored output with automatic terminal detection
 - JSON output option for machine parsing
 - Quiet mode to suppress all but error messages
@@ -370,7 +370,7 @@ log_info "This is an informational message"
 log_debug "This is a debug message (hidden by default)"
 log_warn "This is a warning message"
 log_error "This is an error message"
-log_success "This is a success message"
+log_done "This is a done message"
 
 # Or use a custom level
 log "CUSTOM" "This is a custom level message"
@@ -399,7 +399,7 @@ LOGCOL_INFO=$(tput setaf 7)      # White
 LOGCOL_DEBUG=$(tput dim)         # Dim
 LOGCOL_WARN=$(tput setaf 3)      # Yellow
 LOGCOL_ERROR=$(tput setaf 1)     # Red
-LOGCOL_SUCCESS=$(tput setaf 2)   # Green
+LOGCOL_DONE=$(tput setaf 2)   # Green
 LOGCOL_RESET=$(tput sgr0)        # Reset
 ```
 
@@ -421,7 +421,7 @@ bats test/test.bats
 log_info "Starting application..."
 log_warn "Configuration file not found, using defaults"
 log_error "Failed to connect to database"
-log_success "Backup completed successfully"
+log_done "Backup completed successfully"
 ```
 
 ### Using with JSON output
@@ -456,7 +456,7 @@ log_info "Starting example script..."
 log_debug "This debug message is hidden by default"
 log_warn "This is a warning"
 log_error "This is an error"
-log_success "This is a success message"
+log_done "This is a done message"
 
 # Try with DEBUG enabled
 echo "\nWith DEBUG=1:"

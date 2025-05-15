@@ -20,7 +20,7 @@ setup() {
   # Clear variables for tests
   unset DEBUG QUIET LOG_LEVEL NO_COLOR FORCE_COLOR JSON
   unset LOGCOL_INFO LOGCOL_DEBUG LOGCOL_WARN LOGCOL_ERROR 
-  unset LOGCOL_SUCCESS LOGCOL_RESET
+  unset LOGCOL_DONE LOGCOL_RESET
 }
 
 teardown() {
@@ -62,9 +62,9 @@ capture_stderr() {
   [ "$output" = "error message" ]
 }
 
-@test "basic: log_success outputs message to stderr" {
-  run capture_stderr log_success "success message"
-  [ "$output" = "success message" ]
+@test "basic: log_done outputs message to stderr" {
+  run capture_stderr log_done "done message"
+  [ "$output" = "done message" ]
 }
 
 @test "basic: log with custom level outputs message to stderr" {
@@ -88,8 +88,8 @@ capture_stderr() {
   DEBUG=1 run capture_stderr log_error "error message"
   [ "$output" = "[ERROR] error message" ]
   
-  DEBUG=1 run capture_stderr log_success "success message"
-  [ "$output" = "[SUCCESS] success message" ]
+  DEBUG=1 run capture_stderr log_done "done message"
+  [ "$output" = "[DONE] done message" ]
 }
 
 # QUIET mode tests
@@ -103,7 +103,7 @@ capture_stderr() {
   QUIET=1 run capture_stderr log_warn "warn message"
   [ "$output" = "" ]
   
-  QUIET=1 run capture_stderr log_success "success message"
+  QUIET=1 run capture_stderr log_done "done message"
   [ "$output" = "" ]
   
   # Only error messages remain
@@ -122,7 +122,7 @@ capture_stderr() {
   LOG_LEVEL=ERROR run capture_stderr log_warn "warn message"
   [ "$output" = "" ]
   
-  LOG_LEVEL=ERROR run capture_stderr log_success "success message"
+  LOG_LEVEL=ERROR run capture_stderr log_done "done message"
   [ "$output" = "" ]
   
   LOG_LEVEL=ERROR run capture_stderr log_error "error message"
@@ -139,14 +139,14 @@ capture_stderr() {
   LOG_LEVEL=WARN run capture_stderr log_warn "warn message"
   [ "$output" = "warn message" ]
   
-  LOG_LEVEL=WARN run capture_stderr log_success "success message"
+  LOG_LEVEL=WARN run capture_stderr log_done "done message"
   [ "$output" = "" ]
   
   LOG_LEVEL=WARN run capture_stderr log_error "error message"
   [ "$output" = "error message" ]
 }
 
-@test "log level: INFO shows INFO, SUCCESS, WARN, ERROR not DEBUG" {
+@test "log level: INFO shows INFO, DONE, WARN, ERROR not DEBUG" {
   LOG_LEVEL=INFO run capture_stderr log_info "info message"
   [ "$output" = "info message" ]
   
@@ -156,8 +156,8 @@ capture_stderr() {
   LOG_LEVEL=INFO run capture_stderr log_warn "warn message"
   [ "$output" = "warn message" ]
   
-  LOG_LEVEL=INFO run capture_stderr log_success "success message"
-  [ "$output" = "success message" ]
+  LOG_LEVEL=INFO run capture_stderr log_done "done message"
+  [ "$output" = "done message" ]
   
   LOG_LEVEL=INFO run capture_stderr log_error "error message"
   [ "$output" = "error message" ]
@@ -215,4 +215,10 @@ capture_stderr() {
   
   JSON=1 FORCE_COLOR=1 run log_info "test message"
   [ "$output" = '{"level":"info","message":"test message"}' ]
+}
+
+# Test logt_info function
+@test "logt_info outputs timestamped info message" {
+  run capture_stderr logt_info "timestamped message"
+  [[ "$output" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} timestamped message$ ]]
 }
